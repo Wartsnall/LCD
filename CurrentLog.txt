@@ -1,0 +1,650 @@
+Integrating the RAMTEX Graphic Display Library into an Atmega 2560 project in Atmel Studio 6.2 requires careful setup to handle the library's configuration and hardware-specific dependencies. Here's a step-by-step guide to help you:
+
+From RAMTEX email (Questions to RAMTEX.docx 11/8/18 modified for current driver: 
+
+11/8/18 email from Peder Mousten
+
+Start Atmel Studio 6.0
+
+-Select "New Project"
+-Select "GCC C Executable Project" and "AtmelBoards", "Xplain - ATxmega128A1"
+-Name the project eg: "SSD2119" and select the folder location eg.: gclcd\examples\manualex\ili9320\atmel_ssd2119
+
+The project is now created as a demo project with a main.c startup.
+Use the "Solution Explorer" dialogue to set project settings and select files:
+-Right press "ssd2119" and select "Properties", then press "Toolchain"
+-Press "Symbols" under the "AVR/GNU C Compiler, then press the green '+'
+ and enter "GHW_SINGLE_CHIP" and press the "OK" button (to define GHW_SINGLE_CHIP for all modules).
+-At the "Toolchain" select "Directories", press the green '+' to add the following folders to the include path:
+ gclcd\examples\manualex\ili9320\atmel_ssd2119  // 
+ gclcd\inc
+ gclcd\incapp
+ gclcd\fonts
+-At "Miscellaneous" remove the flags: "-Weeor-implicit-function-declaration -Wpointer-arith -Wstrict-prototypes -mrelax"
+-At Linker "Miscellaneous" remove the Other Linker flags: "-Wl, --relax -Wl, --section-start=.BOOT=0x20000"
+-At the "Tool", select the "JTAGICE mkII" as Selected debugger/programmer.
+ Select "Erase entire chip" at Program settings.
+-Rightpress "ssd2119" and select Add->New Folder, name the folder "GCLCD"
+-Rightpress "GCLCD" and Add the following new folders below the GCLCD:
+"common", 
+"fonts", 
+"controller" 
+and "ghwio"
+-Rightpress "common", "Add"->"Existing Item", browse back to "gclcd\common", press <Ctrl><A> to select all files and press the Arrow next to the [Add] button and select "Add As Link".
+Done
+-As above, select and "Add As Link" all *.c files in the "gclcd\fonts" folder.
+Done
+-As above, select and "Add As Link" ghwinit.c from "gclcd\ili9320" to the "GCLCD\controller" folder.
+Done
+
+-As above, select and "Add As Link" the files from "gclcd\s6d0129", expect "ghwinit.c" and the 2 simulator files to the "GCLCD\controller" folder.
+
+!! Conflict ghwinit.c already added as link in step above!!
+Will use above ghwinit.c file 
+
+Will link all but the ghwinit.c file in s6d0129
+
+Sim files are: gsiminitf.c & sim0129.c // see hx8346/readme.txt
+ 
+-As above, select and "Add As Link" "bussim.c" and "ghwioini.c" from "gclcd\examples\manualex\ili9320 \atmel_ssd2119" to the "GCLCD\ghiow" folder
+!! The folder "atmel_ssd2119" does not exist. (No object "atmel_ssd2119"
+
+Take ghwioini.c from  \gclcd\s6d0129\cfgio\
+Take bussim.c from \gclcd\s6d0129\singlechip\
+ 
+-As above, select and "Add As Link" "manualex.c" from "gclcd\examples"
+-Remove the original "main.c" from the project.
+
+6/5/25 All above is done for LCD_Display, except manualex.c and examples since I have to get this hardware going first. 
+
+Steps for Integration // From Copilot 
+1. Set Up Your Project
+
+    Create a new Atmel Studio project for the Atmega 2560.
+    Ensure you have the RAMTEX library files (e.g., .c and .h files) available and add them to your project.
+
+
+2. Include RAMTEX Library Files
+
+    Add the RAMTEX library source files (gdisp.c, gdisp.h, etc.) to your project.
+    Include the library header files in your code:
+    C
+
+    #include "gdisp.h"      // Graphics display library
+    #include "gdefs.h"      // Graphics definitions
+
+3. Configure the RAMTEX Library
+
+    RAMTEX requires a hardware-specific configuration file (gdispcfg.h) to define how the microcontroller interacts with the display.
+    Create or modify the gdispcfg.h file to match your Atmega 2560 setup. Here's an example configuration:
+
+4. Initialize the Library
+
+    Call the RAMTEX initialization function to set up the display:
+    C
+
+    void init_graphics(void) {
+        glcd_init();  // Initialize the graphic display
+    }
+
+5. Write Test Code
+
+    Use RAMTEX functions to test basic display features, such as drawing text or shapes:
+    C
+
+    #include "gdisp.h"
+
+    int main(void) {
+        // Initialize the hardware and graphics library
+        init_graphics();
+        
+        // Clear the screen
+        glcd_clear();
+
+        // Draw text
+        gputs("Hello, RAMTEX!");
+
+        // Draw a rectangle
+        grectangle(10, 10, 50, 30);
+
+        while (1) {
+            // Main loop
+        }
+    }
+
+6. Verify SPI or Parallel Interface
+
+    The RAMTEX library supports both SPI and parallel interfaces for communicating with the LCD. Check your LCD datasheet to determine the communication type.
+    For SPI:
+        Configure SPI in your main.c file:
+        C
+
+        #include <avr/io.h>
+
+        void init_spi(void) {
+            DDRB |= (1 << PB2) | (1 << PB3) | (1 << PB5);  // Set MOSI, SCK, and SS as output
+            SPCR |= (1 << SPE) | (1 << MSTR);              // Enable SPI in Master mode
+        }
+
+7. Ensure Proper Timing
+
+    The RAMTEX library requires proper timing for control signals. If your display uses specific delays, ensure the library's timing functions are tuned accordingly.
+
+8. Debug and Optimize
+
+    Debug using Atmel Studio's simulator or hardware debugger.
+    Optimize memory usage by enabling only the required RAMTEX features in gdispcfg.h.h.
+
+Common Issues
+
+    Incorrect Pin Mapping: Ensure the pins defined in gdispcfg.h match the actual pins connected to your LCD.
+
+    Memory Limitations: The Atmega 2560 has limited RAM, so optimize the RAMTEX configuration to avoid unnecessary memory consumption.
+
+    Timing Problems: If graphics display functions fail, check the timing of control signals using an oscilloscope or logic analyzer.
+
+    Compiler Errors: Ensure the RAMTEX library files are compatible with your compiler version in Atmel Studio 6.2.
+	
+	gdispcfg.h Mods: 
+	
+	Edit the 
+#define GDISPW 480    /* Width */
+#define GDISPH 320    /* Height */ 
+
+for the display being used. 
+
+Unremark one of the #defines for display being used. In this case we are using HX8357 which RAMTEX says is equivalent to HX8346. 
+There are two options for this display: 
+#define GHW_HX8346_REGINTF //uses a register index interface for communication
+#define GHW_HX8346_CMDINTF //uses a command interface for communication
+
+Compile Problem: 
+gdisphdw.h has this #include:
+#include <sgtypes.h>  // STIMGATE type definitions
+
+The manual says (pg 29): In single-chip mode the compiler's native syntax for I/O access can be used in the bussim.c file. In that case the only SG file required by the LCD driver library is SGTYPES.H. This file can be copied from: 
+GCLCD\controller\CFGIO\SGTYPES.H
+
+The problem is, the #include <> denotes a toolchain file, not a local project file. 
+If I change the define to: #include "sgtypes.h", still get the error because the compiler can't find it.    
+
+confirm: sgtypes.h is in the project
+Deleted from project
+
+Rt click on GCSCD, add/ existing file/ GCLCD\S6d0129\CFGIO\SGTYPES.H, as link
+Clean Solution
+Rebuild Solution
+Error: sgtypes.h: No such file or directory
+
+// From gdisphw.h made local because of possible mods. 
+#include "sgtypes.h"
+
+I think the problem is gdisphw.h is called from bussim.h (which is local to the project) with this: #include <gdisphw.h> which is in the toolchain.
+
+OK, I moved all the files in GCLCD\S6d0129\CFGIO\ to TestStore except sgtypes.h.
+I added/ linked sgtypes.h to the project and included the path in the toolchain directories. 
+I still get 70 errors, something is in there that screwing it up.
+
+Moved all the files back. Remove path.  
+1 Error at gdisphw.h, #include <sgtypes.h> No such file or directory. 
+#include <sgtypes.h> is in gdisphw.h
+bussin.h has #include <gdisphw.h>
+bussim.h is #include "bussim.h" in main.c
+
+Output: 
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gdisphw.h(116,21): error: sgtypes.h: No such file or directory
+		 #include <sgtypes.h>
+		                     ^
+		compilation terminated.
+		make: *** [GCLCD/common/gcarc.o] Error 1
+		
+Copilot: The error message suggests that the compiler is interpreting #include <sgtypes.h> as a system-level include, meaning it is searching system paths (toolchain directories) but cannot locate sgtypes.h. Since sgtypes.h is a local file, the toolchain paths are not appropriate for the file’s location.
+
+1. Change #include <sgtypes.h> to #include "sgtypes.h"
+
+    Open gdisphw.h from the path:
+    
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gdisphw.h
+
+On line 116, modify:
+
+	#include <sgtypes.h>
+
+To:
+    #include "sgtypes.h"
+
+This change tells the compiler to first search the local project directory for sgtypes.h before falling back to the system include paths.
+2. Ensure sgtypes.h is Accessible
+
+    Confirm sgtypes.h exists in your project's folder. Based on your setup, it should be located in:
+    
+    C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\S6d0129\CFGIO\sgtypes.h
+
+    If sgtypes.h is not already in your project structure, copy it to an include/ folder within your project or alongside gdisphw.h.
+
+Example project structure:
+plaintext
+
+RAMTEX/
+├── gclcd/
+│   ├── inc/
+│   │   ├── gdisphw.h
+│   ├── S6d0129/
+│   │   ├── CFGIO/
+│   │   │   ├── sgtypes.h
+
+3. Add Include Paths
+
+If sgtypes.h is located in a subdirectory (e.g., CFGIO under S6d0129), you will need to add this directory to the compiler's include paths.
+In Atmel Studio
+
+    Open Project Properties.
+    Navigate to Toolchain > AVR/GNU C Compiler > Directories.
+    Add the path:
+    plaintext
+
+    C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\S6d0129\CFGIO
+
+In Makefile
+
+    Add the include path to the CFLAGS:
+    Makefile
+
+    CFLAGS += -I"C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\S6d0129\CFGIO"
+
+Command Line Compilation
+
+    Use the -I flag to add the path:
+    bash
+
+    avr-gcc -I"C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\S6d0129\CFGIO" ...
+
+4. Clean and Rebuild
+
+After making these changes:
+
+    Clean the solution in Atmel Studio (Build > Clean Solution).
+    Rebuild the solution (Build > Rebuild Solution).
+
+5. Test with Verbose Output
+
+If the issue persists, enable verbose output to confirm the compiler is searching the correct paths:
+In GCC Command Line
+
+Add the -v flag:
+bash
+
+avr-gcc -v -I"C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\S6d0129\CFGIO" ...
+
+In Atmel Studio
+
+    Go to Tools > Options.
+    Navigate to Projects and Solutions > Build and Run.
+    Set MSBuild project build output verbosity to Detailed or Diagnostic.
+
+Inspect the output for lines like:
+plaintext
+
+#include "..." search starts here:
+#include <...> search starts here:
+
+Ensure the path to sgtypes.h is included.
+Key Notes
+
+    Using #include "sgtypes.h" ensures the compiler looks for the file in local project directories first.
+    Adding the subdirectory to the compiler's include paths ensures deeper paths (like CFGIO) are searched.
+	
+Output: 
+------ Rebuild All started: Project: LCD_Display, Configuration: Debug AVR ------
+Build started.
+Build succeeded.
+------ Rebuild All started: Project: LCD_Display, Configuration: Debug AVR ------
+Build started.
+
+		In file included from ../../../../../Programming/RAMTEX/gclcd/inc/gdisp.h:75:0,
+		                 from ../../../../../Programming/RAMTEX/gclcd/inc/gi_disp.h:95,
+		                 from ../../../../../Programming/RAMTEX/gclcd/common/gcarc.c:25:
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gdisphw.h(116,21): error: sgtypes.h: No such file or directory
+		 #include "sgtypes.h"
+		                     ^
+		compilation terminated.
+		make: *** [GCLCD/common/gcarc.o] Error 1
+	Done executing task "RunCompilerTask" -- FAILED.
+Done building target "CoreBuild" in project "LCD_Display.cproj" -- FAILED.
+Done building project "LCD_Display.cproj" -- FAILED.
+
+Build FAILED.
+========== Rebuild All: 0 succeeded, 1 failed, 0 skipped ==========
+
+Me to Copilot: The sgtypes.h is local in the ghwio folder here's the path: C:\Users\Steve\Documents\Atmel Studio\6.2\LCD_Display\LCD_Display. I changed #include <sgtypes.h> to #include "sgtypes.h" in gdisphw.h  I still get this: C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gdisphw.h(116,21): error: sgtypes.h: No such file or directory
+		 #include "sgtypes.h"
+		                     ^
+		compilation terminated.
+		make: *** [GCLCD/common/gcarc.o] Error 1
+
+Suggested Solution: 
+Double check the file location, in the path of the project. Yes the file is there. 
+The file is accessible and not hidden/ protected by permission. No it is not. 
+Update Include paths in Atmel Studio: 
+Add this path to Toolchain/compiler/directories:
+C:\Users\Steve\Documents\Atmel Studio\6.2\LCD_Display\LCD_Display\ghwio  - Done
+Clean - Clean build
+Rebuild Solution - 70 Errors 
+
+------ Rebuild All started: Project: LCD_Display, Configuration: Debug AVR ------
+Build started.
+Build succeeded.
+------ Rebuild All started: Project: LCD_Display, Configuration: Debug AVR ------
+Build started.
+
+Done building project "LCD_Display.cproj" -- FAILED.
+
+Build FAILED.
+========== Rebuild All: 0 succeeded, 1 failed, 0 skipped ==========
+70 Errors
+
+Returned gdisphw.h #include to <sgtypes.h>
+Deleted path in toolchain directories to local ghwio directory
+Removed link in /ghwio local directory and
+Added file to project for 
+
+1 error : sgtypes.h: No such file or directory
+
+How many sgtypes.h are there in the library? 
+173
+
+Strange thing, the sgtypes.h was still in the local ghwio folder (in Windows Explorer) after I deleted the link in Atmel Studio. The new added folder was in the root dir of the project. I deleted the /ghwio file in Windows. 
+
+Here's Output after clean build and rebuild:
+------ Rebuild All started: Project: LCD_Display, Configuration: Debug AVR ------
+Build started.
+Project "LCD_Display.cproj" (Clean target(s)):
+Target "Clean" in file "C:\Program Files (x86)\Atmel\Atmel Studio 6.2\Vs\Compiler.targets" from project "C:\Users\Steve\Documents\Atmel Studio\6.2\LCD_Display\LCD_Display\LCD_Display.cproj" (entry point):
+	Task "RunCompilerTask"
+		Shell Utils Path C:\Program Files (x86)\Atmel\Atmel Studio 6.2\shellUtils
+		C:\Program Files (x86)\Atmel\Atmel Studio 6.2\shellUtils\make.exe clean 
+		rm -rf  GCLCD/common/gcarc.o GCLCD/common/gcgetbak.o GCLCD/common/gcgetfor.o GCLCD/common/gchlnsp.o GCLCD/common/gcpsel.o GCLCD/common/gcsetbak.o GCLCD/common/gcsetfor.o GCLCD/common/gfcursor.o GCLCD/common/gfgetcxp.o GCLCD/common/gfgetcyp.o GCLCD/common/gfgeth.o GCLCD/common/gfgetw.o GCLCD/common/gfillfsym.o GCLCD/common/gfputch.o GCLCD/common/gfsel.o GCLCD/common/gfsetcp.o GCLCD/common/gfsetp.o GCLCD/common/gfsymw.o GCLCD/common/gftabs.o GCLCD/common/ggcircle.o GCLCD/common/ggetfsym.o GCLCD/common/ggetmbc.o GCLCD/common/ggetmode.o GCLCD/common/gggetxyp.o GCLCD/common/ggline.o GCLCD/common/ggpixel.o GCLCD/common/ggrect.o GCLCD/common/gicarc.o GCLCD/common/giputsym.o GCLCD/common/gmbcpyw.o GCLCD/common/gmstrcpy.o GCLCD/common/gmstrlen.o GCLCD/common/gpstrh.o GCLCD/common/gputchrot.o GCLCD/common/gputfsym.o GCLCD/common/gputsrot.o GCLCD/common/gputsymrot.o GCLCD/common/groundrec.o GCLCD/common/gscreen.o GCLCD/common/gsetcpy.o GCLCD/common/gslen.o GCLCD/common/gsputs.o GCLCD/common/gstrln.o GCLCD/common/gsymcput.o GCLCD/common/gsymfill.o GCLCD/common/gsymget.o GCLCD/common/gsympixrd.o GCLCD/common/gsymput.o GCLCD/common/gvpapp.o GCLCD/common/gvpclr.o GCLCD/common/gvpcset.o GCLCD/common/gvpfill.o GCLCD/common/gvpget.o GCLCD/common/gvpinit.o GCLCD/common/gvpinv.o GCLCD/common/gvpmode.o GCLCD/common/gvpreset.o GCLCD/common/gvpscrol.o GCLCD/common/gvpsel.o GCLCD/common/gvpset.o GCLCD/common/gvpvph.o GCLCD/common/gvpvpw.o GCLCD/common/gvpxl.o GCLCD/common/gvpxr.o GCLCD/common/gvpyb.o GCLCD/common/gvpyt.o GCLCD/fonts/ariel18.o GCLCD/fonts/ariel9.o GCLCD/fonts/cp8859_14.o GCLCD/fonts/cp8859_9.o GCLCD/fonts/footnote.o GCLCD/fonts/mono5_8.o GCLCD/fonts/mono8_8.o GCLCD/fonts/ms58p.o GCLCD/fonts/msfont58.o GCLCD/fonts/msfont78.o GCLCD/fonts/narrow10.o GCLCD/fonts/narrow10_w.o GCLCD/fonts/narrow13_e.o GCLCD/fonts/narrow15.o GCLCD/fonts/narrow15_w.o GCLCD/fonts/narrow18_e.o GCLCD/fonts/narrow20.o GCLCD/fonts/narrow20_w.o GCLCD/fonts/narrow24_e.o GCLCD/fonts/times13.o GCLCD/fonts/times16.o GCLCD/fonts/times9.o GCLCD/fonts/uni_16x16.o GCLCD/controller/ghwblkrw.o GCLCD/controller/ghwbuf.o GCLCD/controller/ghwfill.o GCLCD/controller/ghwgscrl.o GCLCD/controller/ghwinv.o GCLCD/controller/ghwpixel.o GCLCD/controller/ghwplrgb.o GCLCD/controller/ghwretgl.o GCLCD/controller/ghwsymrd.o GCLCD/controller/ghwsymwr.o GCLCD/controller/gsimintf.o GCLCD/controller/sim0129.o GCLCD/controller/ghwinit.o GCLCD/ghwio/bussim.o GCLCD/ghwio/ghwioini.o main.o spi4.o TFT_spi.o   
+		rm -rf  GCLCD/common/gcarc.d GCLCD/common/gcgetbak.d GCLCD/common/gcgetfor.d GCLCD/common/gchlnsp.d GCLCD/common/gcpsel.d GCLCD/common/gcsetbak.d GCLCD/common/gcsetfor.d GCLCD/common/gfcursor.d GCLCD/common/gfgetcxp.d GCLCD/common/gfgetcyp.d GCLCD/common/gfgeth.d GCLCD/common/gfgetw.d GCLCD/common/gfillfsym.d GCLCD/common/gfputch.d GCLCD/common/gfsel.d GCLCD/common/gfsetcp.d GCLCD/common/gfsetp.d GCLCD/common/gfsymw.d GCLCD/common/gftabs.d GCLCD/common/ggcircle.d GCLCD/common/ggetfsym.d GCLCD/common/ggetmbc.d GCLCD/common/ggetmode.d GCLCD/common/gggetxyp.d GCLCD/common/ggline.d GCLCD/common/ggpixel.d GCLCD/common/ggrect.d GCLCD/common/gicarc.d GCLCD/common/giputsym.d GCLCD/common/gmbcpyw.d GCLCD/common/gmstrcpy.d GCLCD/common/gmstrlen.d GCLCD/common/gpstrh.d GCLCD/common/gputchrot.d GCLCD/common/gputfsym.d GCLCD/common/gputsrot.d GCLCD/common/gputsymrot.d GCLCD/common/groundrec.d GCLCD/common/gscreen.d GCLCD/common/gsetcpy.d GCLCD/common/gslen.d GCLCD/common/gsputs.d GCLCD/common/gstrln.d GCLCD/common/gsymcput.d GCLCD/common/gsymfill.d GCLCD/common/gsymget.d GCLCD/common/gsympixrd.d GCLCD/common/gsymput.d GCLCD/common/gvpapp.d GCLCD/common/gvpclr.d GCLCD/common/gvpcset.d GCLCD/common/gvpfill.d GCLCD/common/gvpget.d GCLCD/common/gvpinit.d GCLCD/common/gvpinv.d GCLCD/common/gvpmode.d GCLCD/common/gvpreset.d GCLCD/common/gvpscrol.d GCLCD/common/gvpsel.d GCLCD/common/gvpset.d GCLCD/common/gvpvph.d GCLCD/common/gvpvpw.d GCLCD/common/gvpxl.d GCLCD/common/gvpxr.d GCLCD/common/gvpyb.d GCLCD/common/gvpyt.d GCLCD/fonts/ariel18.d GCLCD/fonts/ariel9.d GCLCD/fonts/cp8859_14.d GCLCD/fonts/cp8859_9.d GCLCD/fonts/footnote.d GCLCD/fonts/mono5_8.d GCLCD/fonts/mono8_8.d GCLCD/fonts/ms58p.d GCLCD/fonts/msfont58.d GCLCD/fonts/msfont78.d GCLCD/fonts/narrow10.d GCLCD/fonts/narrow10_w.d GCLCD/fonts/narrow13_e.d GCLCD/fonts/narrow15.d GCLCD/fonts/narrow15_w.d GCLCD/fonts/narrow18_e.d GCLCD/fonts/narrow20.d GCLCD/fonts/narrow20_w.d GCLCD/fonts/narrow24_e.d GCLCD/fonts/times13.d GCLCD/fonts/times16.d GCLCD/fonts/times9.d GCLCD/fonts/uni_16x16.d GCLCD/controller/ghwblkrw.d GCLCD/controller/ghwbuf.d GCLCD/controller/ghwfill.d GCLCD/controller/ghwgscrl.d GCLCD/controller/ghwinv.d GCLCD/controller/ghwpixel.d GCLCD/controller/ghwplrgb.d GCLCD/controller/ghwretgl.d GCLCD/controller/ghwsymrd.d GCLCD/controller/ghwsymwr.d GCLCD/controller/gsimintf.d GCLCD/controller/sim0129.d GCLCD/controller/ghwinit.d GCLCD/ghwio/bussim.d GCLCD/ghwio/ghwioini.d main.d spi4.d TFT_spi.d   
+		rm -rf "LCD_Display.elf" "LCD_Display.a" "LCD_Display.hex" "LCD_Display.lss" "LCD_Display.eep" "LCD_Display.map" "LCD_Display.srec" "LCD_Display.usersignatures"
+	Done executing task "RunCompilerTask".
+Done building target "Clean" in project "LCD_Display.cproj".
+Done building project "LCD_Display.cproj".
+
+Build succeeded.
+------ Rebuild All started: Project: LCD_Display, Configuration: Debug AVR ------
+Build started.
+Project "LCD_Display.cproj" (default targets):
+Target "PreBuildEvent" skipped, due to false condition; ('$(PreBuildEvent)'!='') was evaluated as (''!='').
+Target "CoreBuild" in file "C:\Program Files (x86)\Atmel\Atmel Studio 6.2\Vs\Compiler.targets" from project "C:\Users\Steve\Documents\Atmel Studio\6.2\LCD_Display\LCD_Display\LCD_Display.cproj" (target "Build" depends on it):
+	Task "RunCompilerTask"
+		Shell Utils Path C:\Program Files (x86)\Atmel\Atmel Studio 6.2\shellUtils
+		C:\Program Files (x86)\Atmel\Atmel Studio 6.2\shellUtils\make.exe all 
+		Building file: ../../../../../Programming/RAMTEX/gclcd/common/gcarc.c
+		Invoking: AVR/GNU C Compiler : 4.8.1
+		"C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe"  -x c -funsigned-char -funsigned-bitfields -DDEBUG -DGHW_SINGLE_CHIP  -I"../../../../../Programming/RAMTEX/gclcd/examples/manualex/hx8346" -I"../../../../../Programming/RAMTEX/gclcd/inc" -I"../../../../../Programming/RAMTEX/gclcd/incapp" -I"../../../../../Programming/RAMTEX/gclcd/fonts"  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -g2 -Wall -mmcu=atmega2560 -c -std=gnu99 -MD -MP -MF "GCLCD/common/gcarc.d" -MT"GCLCD/common/gcarc.d" -MT"GCLCD/common/gcarc.o"   -o "GCLCD/common/gcarc.o" "../../../../../Programming/RAMTEX/gclcd/common/gcarc.c" 
+		In file included from ../../../../../Programming/RAMTEX/gclcd/inc/gdisp.h:75:0,
+		                 from ../../../../../Programming/RAMTEX/gclcd/inc/gi_disp.h:95,
+		                 from ../../../../../Programming/RAMTEX/gclcd/common/gcarc.c:25:
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gdisphw.h(116,21): error: sgtypes.h: No such file or directory
+		 #include <sgtypes.h>
+		                     ^
+		compilation terminated.
+		make: *** [GCLCD/common/gcarc.o] Error 1
+	Done executing task "RunCompilerTask" -- FAILED.
+Done building target "CoreBuild" in project "LCD_Display.cproj" -- FAILED.
+Done building project "LCD_Display.cproj" -- FAILED.
+
+Build FAILED.
+========== Rebuild All: 0 succeeded, 1 failed, 0 skipped ==========
+
+From this, it looks like sgtypes.h should be in: C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\
+
+Maybe I'll try copying the f'ing thing to there.
+
+gdisphw.h is in the gclcd/inc directory, I will move the sgtypes.h file to there. With a note in comments that it is the project's copy. 
+Still results in 70 errors. 
+Output: 
+------ Rebuild All started: Project: LCD_Display, Configuration: Debug AVR ------
+Build started.
+Project "LCD_Display.cproj" (Clean target(s)):
+Target "Clean" in file "C:\Program Files (x86)\Atmel\Atmel Studio 6.2\Vs\Compiler.targets" from project "C:\Users\Steve\Documents\Atmel Studio\6.2\LCD_Display\LCD_Display\LCD_Display.cproj" (entry point):
+	Using "RunCompilerTask" task from assembly "C:\Program Files (x86)\Atmel\Atmel Studio 6.2\Extensions\Application\AvrGCC.dll".
+	Task "RunCompilerTask"
+		Shell Utils Path C:\Program Files (x86)\Atmel\Atmel Studio 6.2\shellUtils
+		C:\Program Files (x86)\Atmel\Atmel Studio 6.2\shellUtils\make.exe clean 
+		rm -rf  GCLCD/common/gcarc.o GCLCD/common/gcgetbak.o GCLCD/common/gcgetfor.o GCLCD/common/gchlnsp.o GCLCD/common/gcpsel.o GCLCD/common/gcsetbak.o GCLCD/common/gcsetfor.o GCLCD/common/gfcursor.o GCLCD/common/gfgetcxp.o GCLCD/common/gfgetcyp.o GCLCD/common/gfgeth.o GCLCD/common/gfgetw.o GCLCD/common/gfillfsym.o GCLCD/common/gfputch.o GCLCD/common/gfsel.o GCLCD/common/gfsetcp.o GCLCD/common/gfsetp.o GCLCD/common/gfsymw.o GCLCD/common/gftabs.o GCLCD/common/ggcircle.o GCLCD/common/ggetfsym.o GCLCD/common/ggetmbc.o GCLCD/common/ggetmode.o GCLCD/common/gggetxyp.o GCLCD/common/ggline.o GCLCD/common/ggpixel.o GCLCD/common/ggrect.o GCLCD/common/gicarc.o GCLCD/common/giputsym.o GCLCD/common/gmbcpyw.o GCLCD/common/gmstrcpy.o GCLCD/common/gmstrlen.o GCLCD/common/gpstrh.o GCLCD/common/gputchrot.o GCLCD/common/gputfsym.o GCLCD/common/gputsrot.o GCLCD/common/gputsymrot.o GCLCD/common/groundrec.o GCLCD/common/gscreen.o GCLCD/common/gsetcpy.o GCLCD/common/gslen.o GCLCD/common/gsputs.o GCLCD/common/gstrln.o GCLCD/common/gsymcput.o GCLCD/common/gsymfill.o GCLCD/common/gsymget.o GCLCD/common/gsympixrd.o GCLCD/common/gsymput.o GCLCD/common/gvpapp.o GCLCD/common/gvpclr.o GCLCD/common/gvpcset.o GCLCD/common/gvpfill.o GCLCD/common/gvpget.o GCLCD/common/gvpinit.o GCLCD/common/gvpinv.o GCLCD/common/gvpmode.o GCLCD/common/gvpreset.o GCLCD/common/gvpscrol.o GCLCD/common/gvpsel.o GCLCD/common/gvpset.o GCLCD/common/gvpvph.o GCLCD/common/gvpvpw.o GCLCD/common/gvpxl.o GCLCD/common/gvpxr.o GCLCD/common/gvpyb.o GCLCD/common/gvpyt.o GCLCD/fonts/ariel18.o GCLCD/fonts/ariel9.o GCLCD/fonts/cp8859_14.o GCLCD/fonts/cp8859_9.o GCLCD/fonts/footnote.o GCLCD/fonts/mono5_8.o GCLCD/fonts/mono8_8.o GCLCD/fonts/ms58p.o GCLCD/fonts/msfont58.o GCLCD/fonts/msfont78.o GCLCD/fonts/narrow10.o GCLCD/fonts/narrow10_w.o GCLCD/fonts/narrow13_e.o GCLCD/fonts/narrow15.o GCLCD/fonts/narrow15_w.o GCLCD/fonts/narrow18_e.o GCLCD/fonts/narrow20.o GCLCD/fonts/narrow20_w.o GCLCD/fonts/narrow24_e.o GCLCD/fonts/times13.o GCLCD/fonts/times16.o GCLCD/fonts/times9.o GCLCD/fonts/uni_16x16.o GCLCD/controller/ghwblkrw.o GCLCD/controller/ghwbuf.o GCLCD/controller/ghwfill.o GCLCD/controller/ghwgscrl.o GCLCD/controller/ghwinv.o GCLCD/controller/ghwpixel.o GCLCD/controller/ghwplrgb.o GCLCD/controller/ghwretgl.o GCLCD/controller/ghwsymrd.o GCLCD/controller/ghwsymwr.o GCLCD/controller/gsimintf.o GCLCD/controller/sim0129.o GCLCD/controller/ghwinit.o GCLCD/ghwio/bussim.o GCLCD/ghwio/ghwioini.o main.o spi4.o TFT_spi.o   
+		rm -rf  GCLCD/common/gcarc.d GCLCD/common/gcgetbak.d GCLCD/common/gcgetfor.d GCLCD/common/gchlnsp.d GCLCD/common/gcpsel.d GCLCD/common/gcsetbak.d GCLCD/common/gcsetfor.d GCLCD/common/gfcursor.d GCLCD/common/gfgetcxp.d GCLCD/common/gfgetcyp.d GCLCD/common/gfgeth.d GCLCD/common/gfgetw.d GCLCD/common/gfillfsym.d GCLCD/common/gfputch.d GCLCD/common/gfsel.d GCLCD/common/gfsetcp.d GCLCD/common/gfsetp.d GCLCD/common/gfsymw.d GCLCD/common/gftabs.d GCLCD/common/ggcircle.d GCLCD/common/ggetfsym.d GCLCD/common/ggetmbc.d GCLCD/common/ggetmode.d GCLCD/common/gggetxyp.d GCLCD/common/ggline.d GCLCD/common/ggpixel.d GCLCD/common/ggrect.d GCLCD/common/gicarc.d GCLCD/common/giputsym.d GCLCD/common/gmbcpyw.d GCLCD/common/gmstrcpy.d GCLCD/common/gmstrlen.d GCLCD/common/gpstrh.d GCLCD/common/gputchrot.d GCLCD/common/gputfsym.d GCLCD/common/gputsrot.d GCLCD/common/gputsymrot.d GCLCD/common/groundrec.d GCLCD/common/gscreen.d GCLCD/common/gsetcpy.d GCLCD/common/gslen.d GCLCD/common/gsputs.d GCLCD/common/gstrln.d GCLCD/common/gsymcput.d GCLCD/common/gsymfill.d GCLCD/common/gsymget.d GCLCD/common/gsympixrd.d GCLCD/common/gsymput.d GCLCD/common/gvpapp.d GCLCD/common/gvpclr.d GCLCD/common/gvpcset.d GCLCD/common/gvpfill.d GCLCD/common/gvpget.d GCLCD/common/gvpinit.d GCLCD/common/gvpinv.d GCLCD/common/gvpmode.d GCLCD/common/gvpreset.d GCLCD/common/gvpscrol.d GCLCD/common/gvpsel.d GCLCD/common/gvpset.d GCLCD/common/gvpvph.d GCLCD/common/gvpvpw.d GCLCD/common/gvpxl.d GCLCD/common/gvpxr.d GCLCD/common/gvpyb.d GCLCD/common/gvpyt.d GCLCD/fonts/ariel18.d GCLCD/fonts/ariel9.d GCLCD/fonts/cp8859_14.d GCLCD/fonts/cp8859_9.d GCLCD/fonts/footnote.d GCLCD/fonts/mono5_8.d GCLCD/fonts/mono8_8.d GCLCD/fonts/ms58p.d GCLCD/fonts/msfont58.d GCLCD/fonts/msfont78.d GCLCD/fonts/narrow10.d GCLCD/fonts/narrow10_w.d GCLCD/fonts/narrow13_e.d GCLCD/fonts/narrow15.d GCLCD/fonts/narrow15_w.d GCLCD/fonts/narrow18_e.d GCLCD/fonts/narrow20.d GCLCD/fonts/narrow20_w.d GCLCD/fonts/narrow24_e.d GCLCD/fonts/times13.d GCLCD/fonts/times16.d GCLCD/fonts/times9.d GCLCD/fonts/uni_16x16.d GCLCD/controller/ghwblkrw.d GCLCD/controller/ghwbuf.d GCLCD/controller/ghwfill.d GCLCD/controller/ghwgscrl.d GCLCD/controller/ghwinv.d GCLCD/controller/ghwpixel.d GCLCD/controller/ghwplrgb.d GCLCD/controller/ghwretgl.d GCLCD/controller/ghwsymrd.d GCLCD/controller/ghwsymwr.d GCLCD/controller/gsimintf.d GCLCD/controller/sim0129.d GCLCD/controller/ghwinit.d GCLCD/ghwio/bussim.d GCLCD/ghwio/ghwioini.d main.d spi4.d TFT_spi.d   
+		rm -rf "LCD_Display.elf" "LCD_Display.a" "LCD_Display.hex" "LCD_Display.lss" "LCD_Display.eep" "LCD_Display.map" "LCD_Display.srec" "LCD_Display.usersignatures"
+	Done executing task "RunCompilerTask".
+Done building target "Clean" in project "LCD_Display.cproj".
+Done building project "LCD_Display.cproj".
+
+Build succeeded.
+------ Rebuild All started: Project: LCD_Display, Configuration: Debug AVR ------
+Build started.
+Project "LCD_Display.cproj" (default targets):
+Target "PreBuildEvent" skipped, due to false condition; ('$(PreBuildEvent)'!='') was evaluated as (''!='').
+Target "CoreBuild" in file "C:\Program Files (x86)\Atmel\Atmel Studio 6.2\Vs\Compiler.targets" from project "C:\Users\Steve\Documents\Atmel Studio\6.2\LCD_Display\LCD_Display\LCD_Display.cproj" (target "Build" depends on it):
+	Task "RunCompilerTask"
+		Shell Utils Path C:\Program Files (x86)\Atmel\Atmel Studio 6.2\shellUtils
+		C:\Program Files (x86)\Atmel\Atmel Studio 6.2\shellUtils\make.exe all 
+		Building file: ../../../../../Programming/RAMTEX/gclcd/common/gcarc.c
+		Invoking: AVR/GNU C Compiler : 4.8.1
+		"C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe"  -x c -funsigned-char -funsigned-bitfields -DDEBUG -DGHW_SINGLE_CHIP  -I"../../../../../Programming/RAMTEX/gclcd/examples/manualex/hx8346" -I"../../../../../Programming/RAMTEX/gclcd/inc" -I"../../../../../Programming/RAMTEX/gclcd/incapp" -I"../../../../../Programming/RAMTEX/gclcd/fonts"  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -g2 -Wall -mmcu=atmega2560 -c -std=gnu99 -MD -MP -MF "GCLCD/common/gcarc.d" -MT"GCLCD/common/gcarc.d" -MT"GCLCD/common/gcarc.o"   -o "GCLCD/common/gcarc.o" "../../../../../Programming/RAMTEX/gclcd/common/gcarc.c" 
+		In file included from ../../../../../Programming/RAMTEX/gclcd/inc/gdisp.h:75:0,
+		                 from ../../../../../Programming/RAMTEX/gclcd/inc/gi_disp.h:95,
+		                 from ../../../../../Programming/RAMTEX/gclcd/common/gcarc.c:25:
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gdisphw.h(702,1): error: unknown type name 'GCODE'
+		 typedef GCODE GSYMHEAD PFCODE *PGSYMHEAD;
+		 ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gdisphw.h(702,31): error: expected '=', ',', ';', 'asm' or '__attribute__' before '*' token
+		 typedef GCODE GSYMHEAD PFCODE *PGSYMHEAD;
+		                               ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gdisphw.h(710,1): error: unknown type name 'GCODE'
+		 typedef GCODE GBWSYMBOL PFCODE * PGBWSYMBOL;
+		 ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gdisphw.h(710,32): error: expected '=', ',', ';', 'asm' or '__attribute__' before '*' token
+		 typedef GCODE GBWSYMBOL PFCODE * PGBWSYMBOL;
+		                                ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gdisphw.h(721,1): error: unknown type name 'GCODE'
+		 typedef GCODE GCSYMHEAD PFCODE * PGCSYMHEAD;
+		 ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gdisphw.h(721,32): error: expected '=', ',', ';', 'asm' or '__attribute__' before '*' token
+		 typedef GCODE GCSYMHEAD PFCODE * PGCSYMHEAD;
+		                                ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gdisphw.h(729,1): error: unknown type name 'GCODE'
+		 typedef GCODE GCSYMBOL PFCODE * PGCSYMBOL;
+		 ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gdisphw.h(729,31): error: expected '=', ',', ';', 'asm' or '__attribute__' before '*' token
+		 typedef GCODE GCSYMBOL PFCODE * PGCSYMBOL;
+		                               ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gdisphw.h(781,1): error: unknown type name 'GCODE'
+		 typedef GCODE GSYMBOL PFCODE * PGSYMBOL;
+		 ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gdisphw.h(781,30): error: expected '=', ',', ';', 'asm' or '__attribute__' before '*' token
+		 typedef GCODE GSYMBOL PFCODE * PGSYMBOL;
+		                              ^
+		In file included from ../../../../../Programming/RAMTEX/gclcd/inc/gdisphw.h:116:0,
+		                 from ../../../../../Programming/RAMTEX/gclcd/inc/gdisp.h:75,
+		                 from ../../../../../Programming/RAMTEX/gclcd/inc/gi_disp.h:95,
+		                 from ../../../../../Programming/RAMTEX/gclcd/common/gcarc.c:25:
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\sgtypes.h(108,20): error: expected '=', ',', ';', 'asm' or '__attribute__' before 'unsigned'
+		    #define SGUCHAR unsigned char  /* 8 bit */
+		                    ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gdisphw.h(782,15): info: in expansion of macro 'SGUCHAR'
+		 typedef GCODE SGUCHAR PFCODE * PGSYMBYTE; /* Pointer to graphic symbol data */
+		               ^
+		In file included from ../../../../../Programming/RAMTEX/gclcd/inc/gdisp.h:75:0,
+		                 from ../../../../../Programming/RAMTEX/gclcd/inc/gi_disp.h:95,
+		                 from ../../../../../Programming/RAMTEX/gclcd/common/gcarc.c:25:
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gdisphw.h(796,1): error: unknown type name 'GCODE'
+		 typedef GCODE GCP_RANGE PFCODE * PGCP_RANGE;
+		 ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gdisphw.h(796,32): error: expected '=', ',', ';', 'asm' or '__attribute__' before '*' token
+		 typedef GCODE GCP_RANGE PFCODE * PGCP_RANGE;
+		                                ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gdisphw.h(804,1): error: unknown type name 'GCODE'
+		 typedef GCODE GCPHEAD PFCODE * PGCPHEAD;
+		 ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gdisphw.h(804,30): error: expected '=', ',', ';', 'asm' or '__attribute__' before '*' token
+		 typedef GCODE GCPHEAD PFCODE * PGCPHEAD;
+		                              ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gdisphw.h(812,1): error: unknown type name 'GCODE'
+		 typedef GCODE GCODEPAGE PFCODE * PGCODEPAGE;
+		 ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gdisphw.h(812,32): error: expected '=', ',', ';', 'asm' or '__attribute__' before '*' token
+		 typedef GCODE GCODEPAGE PFCODE * PGCODEPAGE;
+		                                ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gdisphw.h(824,4): error: unknown type name 'PGSYMBOL'
+		    PGSYMBOL   psymbols;   /* pointer to array of GSYMBOL's (may be NULL) */
+		    ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gdisphw.h(826,4): error: unknown type name 'PGCODEPAGE'
+		    PGCODEPAGE pcodepage;  /* pointer to default codepage for font (may be NULL) */
+		    ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gdisphw.h(829,1): error: unknown type name 'GCODE'
+		 typedef GCODE GFONT PFCODE * PGFONT;
+		 ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gdisphw.h(829,28): error: expected '=', ',', ';', 'asm' or '__attribute__' before '*' token
+		 typedef GCODE GFONT PFCODE * PGFONT;
+		                            ^
+		In file included from ../../../../../Programming/RAMTEX/gclcd/inc/gdisp.h:75:0,
+		                 from ../../../../../Programming/RAMTEX/gclcd/inc/gi_disp.h:95,
+		                 from ../../../../../Programming/RAMTEX/gclcd/common/gcarc.c:25:
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gdisphw.h(1090,21): error: unknown type name 'PGSYMBOL'
+		 SGBOOL ghw_loadsym( PGSYMBOL psymtab, SGUCHAR nosym, SGUCHAR offset);
+		                     ^
+		In file included from ../../../../../Programming/RAMTEX/gclcd/inc/gdisphw.h:1515:0,
+		                 from ../../../../../Programming/RAMTEX/gclcd/inc/gdisp.h:75,
+		                 from ../../../../../Programming/RAMTEX/gclcd/inc/gi_disp.h:95,
+		                 from ../../../../../Programming/RAMTEX/gclcd/common/gcarc.c:25:
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(47,1): error: unknown type name 'GCODE'
+		 extern GCODE GFONT FCODE ariel18;
+		 ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(47,20): error: expected '=', ',', ';', 'asm' or '__attribute__' before 'FCODE'
+		 extern GCODE GFONT FCODE ariel18;
+		                    ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(47,20): error: unknown type name 'FCODE'
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(48,1): error: unknown type name 'GCODE'
+		 extern GCODE GFONT FCODE ariel9;
+		 ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(48,20): error: expected '=', ',', ';', 'asm' or '__attribute__' before 'FCODE'
+		 extern GCODE GFONT FCODE ariel9;
+		                    ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(48,20): error: unknown type name 'FCODE'
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(49,1): error: unknown type name 'GCODE'
+		 extern GCODE GFONT FCODE cp8859_9;
+		 ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(49,20): error: expected '=', ',', ';', 'asm' or '__attribute__' before 'FCODE'
+		 extern GCODE GFONT FCODE cp8859_9;
+		                    ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(49,20): error: unknown type name 'FCODE'
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(50,1): error: unknown type name 'GCODE'
+		 extern GCODE GFONT FCODE cp8859_14;
+		 ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(50,20): error: expected '=', ',', ';', 'asm' or '__attribute__' before 'FCODE'
+		 extern GCODE GFONT FCODE cp8859_14;
+		                    ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(50,20): error: unknown type name 'FCODE'
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(51,1): error: unknown type name 'GCODE'
+		 extern GCODE GFONT FCODE footnote;
+		 ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(51,20): error: expected '=', ',', ';', 'asm' or '__attribute__' before 'FCODE'
+		 extern GCODE GFONT FCODE footnote;
+		                    ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(51,20): error: unknown type name 'FCODE'
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(52,1): error: unknown type name 'GCODE'
+		 extern GCODE GFONT FCODE mono5_8;
+		 ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(52,20): error: expected '=', ',', ';', 'asm' or '__attribute__' before 'FCODE'
+		 extern GCODE GFONT FCODE mono5_8;
+		                    ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(52,20): error: unknown type name 'FCODE'
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(53,1): error: unknown type name 'GCODE'
+		 extern GCODE GFONT FCODE mono8_8;
+		 ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(53,20): error: expected '=', ',', ';', 'asm' or '__attribute__' before 'FCODE'
+		 extern GCODE GFONT FCODE mono8_8;
+		                    ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(53,20): error: unknown type name 'FCODE'
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(54,1): error: unknown type name 'GCODE'
+		 extern GCODE GFONT FCODE ms58p;
+		 ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(54,20): error: expected '=', ',', ';', 'asm' or '__attribute__' before 'FCODE'
+		 extern GCODE GFONT FCODE ms58p;
+		                    ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(54,20): error: unknown type name 'FCODE'
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(55,1): error: unknown type name 'GCODE'
+		 extern GCODE GFONT FCODE msfont58;
+		 ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(55,20): error: expected '=', ',', ';', 'asm' or '__attribute__' before 'FCODE'
+		 extern GCODE GFONT FCODE msfont58;
+		                    ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(55,20): error: unknown type name 'FCODE'
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(56,1): error: unknown type name 'GCODE'
+		 extern GCODE GFONT FCODE msfont78;
+		 ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(56,20): error: expected '=', ',', ';', 'asm' or '__attribute__' before 'FCODE'
+		 extern GCODE GFONT FCODE msfont78;
+		                    ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(56,20): error: unknown type name 'FCODE'
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(57,1): error: unknown type name 'GCODE'
+		 extern GCODE GFONT FCODE narrow10;    /* Primarily ASCII */
+		 ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(57,20): error: expected '=', ',', ';', 'asm' or '__attribute__' before 'FCODE'
+		 extern GCODE GFONT FCODE narrow10;    /* Primarily ASCII */
+		                    ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(57,20): error: unknown type name 'FCODE'
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(58,1): error: unknown type name 'GCODE'
+		 extern GCODE GFONT FCODE narrow15;
+		 ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(58,20): error: expected '=', ',', ';', 'asm' or '__attribute__' before 'FCODE'
+		 extern GCODE GFONT FCODE narrow15;
+		                    ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(58,20): error: unknown type name 'FCODE'
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(59,1): error: unknown type name 'GCODE'
+		 extern GCODE GFONT FCODE narrow20;
+		 ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(59,20): error: expected '=', ',', ';', 'asm' or '__attribute__' before 'FCODE'
+		 extern GCODE GFONT FCODE narrow20;
+		                    ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(59,20): error: unknown type name 'FCODE'
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(60,1): error: unknown type name 'GCODE'
+		 extern GCODE GFONT FCODE times13;
+		 ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(60,20): error: expected '=', ',', ';', 'asm' or '__attribute__' before 'FCODE'
+		 extern GCODE GFONT FCODE times13;
+		                    ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(60,20): error: unknown type name 'FCODE'
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(61,1): error: unknown type name 'GCODE'
+		 extern GCODE GFONT FCODE times16;
+		 ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(61,20): error: expected '=', ',', ';', 'asm' or '__attribute__' before 'FCODE'
+		 extern GCODE GFONT FCODE times16;
+		                    ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(61,20): error: unknown type name 'FCODE'
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(62,1): error: unknown type name 'GCODE'
+		 extern GCODE GFONT FCODE times9;
+		 ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(62,20): error: expected '=', ',', ';', 'asm' or '__attribute__' before 'FCODE'
+		 extern GCODE GFONT FCODE times9;
+		                    ^
+C:\Users\Steve\Documents\Programming\RAMTEX\gclcd\inc\gi_fonts.h(62,20): error: unknown type name 'FCODE'
+		make: *** [GCLCD/common/gcarc.o] Error 1
+	Done executing task "RunCompilerTask" -- FAILED.
+Done building target "CoreBuild" in project "LCD_Display.cproj" -- FAILED.
+Done building project "LCD_Display.cproj" -- FAILED.
+
+Build FAILED.
+========== Rebuild All: 0 succeeded, 1 failed, 0 skipped ==========
+
+FCODE is defined in gdispcfg.h a local file. 
+Will change back to sgtypes.h as local. Moved #include "gdispcfg.h" to just under #include <avr/io.h>. 
+Clean Solution, Rebuild Solution. 
+Still have sgtypes.h: No such file or directory
+I added a path to the Atmel Studio/6.2/LCD_Display/LCD_Display
+Rebuild gives the 70 errors.
+Change in ghwinit.c #include <s6d0129.h> to #include "s6d0129.h"
+Change in gdisphw.h #include <sgtypes.h> #include "sgtypes.h"
+Get 70 Errors
+Change back  ghwinit.c #include "s6d0129.h" to <s6d0129.h>
+Change back gdisphw.h #include  "sgtypes.h" to <sgtypes.h>

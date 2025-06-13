@@ -1,0 +1,520 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>6.2</ProjectVersion>
+    <ToolchainName>com.Atmel.AVRGCC8.C</ToolchainName>
+    <ProjectGuid>{3431b531-1225-4b62-913d-b2ad585b5c7c}</ProjectGuid>
+    <avrdevice>ATmega2560</avrdevice>
+    <avrdeviceseries>none</avrdeviceseries>
+    <OutputType>Executable</OutputType>
+    <Language>C</Language>
+    <OutputFileName>$(MSBuildProjectName)</OutputFileName>
+    <OutputFileExtension>.elf</OutputFileExtension>
+    <OutputDirectory>$(MSBuildProjectDirectory)\$(Configuration)</OutputDirectory>
+    <AssemblyName>LCD_Display</AssemblyName>
+    <Name>LCD_Display</Name>
+    <RootNamespace>LCD_Display</RootNamespace>
+    <ToolchainFlavour>Native</ToolchainFlavour>
+    <KeepTimersRunning>true</KeepTimersRunning>
+    <OverrideVtor>false</OverrideVtor>
+    <CacheFlash>true</CacheFlash>
+    <ProgFlashFromRam>true</ProgFlashFromRam>
+    <RamSnippetAddress>0x20000000</RamSnippetAddress>
+    <UncachedRange />
+    <preserveEEPROM>true</preserveEEPROM>
+    <OverrideVtorValue>exception_table</OverrideVtorValue>
+    <BootSegment>2</BootSegment>
+    <eraseonlaunchrule>0</eraseonlaunchrule>
+    <AsfFrameworkConfig>
+      <framework-data xmlns="">
+        <options />
+        <configurations />
+        <files />
+        <documentation help="" />
+        <offline-documentation help="" />
+        <dependencies>
+          <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.21.0" />
+        </dependencies>
+      </framework-data>
+    </AsfFrameworkConfig>
+    <avrtool>com.atmel.avrdbg.tool.atmelice</avrtool>
+    <com_atmel_avrdbg_tool_atmelice>
+      <ToolOptions>
+        <InterfaceProperties>
+          <JtagDbgClock>200000</JtagDbgClock>
+        </InterfaceProperties>
+        <InterfaceName>JTAG</InterfaceName>
+      </ToolOptions>
+      <ToolType>com.atmel.avrdbg.tool.atmelice</ToolType>
+      <ToolNumber>J41800094171</ToolNumber>
+      <ToolName>Atmel-ICE</ToolName>
+    </com_atmel_avrdbg_tool_atmelice>
+    <avrtoolinterface>JTAG</avrtoolinterface>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <ToolchainSettings>
+      <AvrGcc>
+        <avrgcc.common.optimization.RelaxBranches>True</avrgcc.common.optimization.RelaxBranches>
+        <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
+        <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
+        <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
+        <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
+        <avrgcc.common.outputfiles.usersignatures>False</avrgcc.common.outputfiles.usersignatures>
+        <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
+        <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+        <avrgcc.compiler.symbols.DefSymbols>
+          <ListValues>
+            <Value>NDEBUG</Value>
+          </ListValues>
+        </avrgcc.compiler.symbols.DefSymbols>
+        <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
+        <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+        <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+        <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+        <avrgcc.linker.libraries.Libraries>
+          <ListValues>
+            <Value>libm</Value>
+          </ListValues>
+        </avrgcc.linker.libraries.Libraries>
+      </AvrGcc>
+    </ToolchainSettings>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <ToolchainSettings>
+      <AvrGcc>
+  <avrgcc.common.optimization.RelaxBranches>True</avrgcc.common.optimization.RelaxBranches>
+  <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
+  <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
+  <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
+  <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
+  <avrgcc.common.outputfiles.usersignatures>False</avrgcc.common.outputfiles.usersignatures>
+  <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
+  <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+  <avrgcc.compiler.symbols.DefSymbols>
+    <ListValues>
+      <Value>DEBUG</Value>
+      <Value>GHW_SINGLE_CHIP</Value>
+      <Value>SGPPCMODE</Value>
+      <Value>F_CPU=16000000UL</Value>
+    </ListValues>
+  </avrgcc.compiler.symbols.DefSymbols>
+  <avrgcc.compiler.directories.IncludePaths>
+    <ListValues>
+      <Value>../../../../../Programming/RAMTEX/gclcd/inc</Value>
+      <Value>../../../../../Programming/RAMTEX/gclcd/incapp</Value>
+      <Value>../../../../../Programming/RAMTEX/gclcd/fonts</Value>
+      <Value>../..</Value>
+      <Value>../../../../../Programming/RAMTEX/gclcd/hx8346/ccfg8346</Value>
+      <Value>../../../../../Programming/RAMTEX/gclcd/s6d0129/cfgio</Value>
+      <Value>../../../../../Programming/RAMTEX/gclcd/s6d0129/singlchp</Value>
+      <Value>..</Value>
+    </ListValues>
+  </avrgcc.compiler.directories.IncludePaths>
+  <avrgcc.compiler.optimization.level>Optimize (-O1)</avrgcc.compiler.optimization.level>
+  <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+  <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+  <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
+  <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+  <avrgcc.compiler.miscellaneous.OtherFlags>-std=gnu99 -Wno-unknown-pragmas</avrgcc.compiler.miscellaneous.OtherFlags>
+  <avrgcc.linker.libraries.Libraries>
+    <ListValues>
+      <Value>libm</Value>
+    </ListValues>
+  </avrgcc.linker.libraries.Libraries>
+  <avrgcc.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcc.assembler.debugging.DebugLevel>
+</AvrGcc>
+    </ToolchainSettings>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gcarc.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gcarc.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gcgetbak.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gcgetbak.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gcgetfor.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gcgetfor.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gchlnsp.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gchlnsp.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gcpsel.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gcpsel.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gcsetbak.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gcsetbak.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gcsetfor.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gcsetfor.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gfcursor.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gfcursor.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gfgetcxp.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gfgetcxp.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gfgetcyp.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gfgetcyp.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gfgeth.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gfgeth.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gfgetw.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gfgetw.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gfillfsym.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gfillfsym.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gfputch.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gfputch.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gfsel.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gfsel.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gfsetcp.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gfsetcp.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gfsetp.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gfsetp.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gfsymw.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gfsymw.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gftabs.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gftabs.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\ggcircle.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\ggcircle.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\ggetfsym.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\ggetfsym.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\ggetmbc.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\ggetmbc.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\ggetmode.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\ggetmode.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gggetxyp.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gggetxyp.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\ggline.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\ggline.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\ggpixel.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\ggpixel.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\ggrect.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\ggrect.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gicarc.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gicarc.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\giputsym.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\giputsym.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gmbcpyw.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gmbcpyw.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gmstrcpy.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gmstrcpy.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gmstrlen.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gmstrlen.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gpstrh.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gpstrh.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gputchrot.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gputchrot.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gputfsym.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gputfsym.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gputsrot.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gputsrot.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gputsymrot.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gputsymrot.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\groundrec.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\groundrec.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gscreen.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gscreen.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gsetcpy.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gsetcpy.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gslen.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gslen.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gsputs.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gsputs.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gstrln.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gstrln.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gsymcput.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gsymcput.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gsymfill.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gsymfill.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gsymget.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gsymget.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gsympixrd.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gsympixrd.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gsymput.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gsymput.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gvpapp.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gvpapp.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gvpclr.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gvpclr.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gvpcset.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gvpcset.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gvpfill.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gvpfill.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gvpget.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gvpget.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gvpinit.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gvpinit.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gvpinv.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gvpinv.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gvpmode.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gvpmode.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gvpreset.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gvpreset.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gvpscrol.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gvpscrol.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gvpsel.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gvpsel.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gvpset.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gvpset.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gvpvph.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gvpvph.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gvpvpw.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gvpvpw.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gvpxl.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gvpxl.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gvpxr.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gvpxr.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gvpyb.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gvpyb.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\common\gvpyt.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\common\gvpyt.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\s6d0129\ghwblkrw.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\controller\ghwblkrw.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\s6d0129\ghwbuf.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\controller\ghwbuf.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\s6d0129\ghwfill.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\controller\ghwfill.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\s6d0129\ghwgscrl.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\controller\ghwgscrl.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\s6d0129\ghwinv.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\controller\ghwinv.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\s6d0129\ghwpixel.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\controller\ghwpixel.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\s6d0129\ghwplrgb.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\controller\ghwplrgb.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\s6d0129\ghwretgl.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\controller\ghwretgl.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\s6d0129\ghwsymrd.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\controller\ghwsymrd.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\..\Programming\RAMTEX\gclcd\s6d0129\ghwsymwr.c">
+      <SubType>compile</SubType>
+      <Link>GCLCD\controller\ghwsymwr.c</Link>
+    </Compile>
+    <Compile Include="GCLCD\common\ghwbuf.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="GCLCD\common\ghwcolcv.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="GCLCD\common\ghwinit.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="GCLCD\fonts\ariel18.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="GCLCD\fonts\ariel9.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="GCLCD\fonts\cp8859_14.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="GCLCD\fonts\cp8859_9.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="GCLCD\fonts\footnote.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="GCLCD\fonts\mono5_8.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="GCLCD\fonts\mono8_8.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="GCLCD\fonts\ms58p.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="GCLCD\fonts\msfont58.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="GCLCD\fonts\msfont78.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="GCLCD\ghwio\bussim.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="GCLCD\ghwio\ghwioini.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="gdispcfg.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="hx8357d.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="hx8375d.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="main.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="spi4.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="spi4.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TFT_spi.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TFT_spi.h">
+      <SubType>compile</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="GCLCD\fonts\ariel9.cp">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="gcolor_4.pal">
+      <SubType>compile</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="GCLCD" />
+    <Folder Include="GCLCD\common" />
+    <Folder Include="GCLCD\fonts" />
+    <Folder Include="GCLCD\controller" />
+    <Folder Include="GCLCD\ghwio" />
+  </ItemGroup>
+  <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
+</Project>
